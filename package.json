@@ -1,0 +1,31 @@
+{
+  "name": "node-manticoresearch",
+  "version": "0.0.1",
+  "description": "Simple, Light, Promise",
+
+  "author": {
+    "name": "Daeren",
+    "email": "x@db.gg"
+  },
+  "homepage": "https://666.io",
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Daeren/node-manticoresearch.git"
+  },
+
+  "scripts": {
+  },
+
+  "keywords": [
+    "manticoresearch",
+    "politic-free"
+  ],
+  "license": "MIT",
+
+  "dependencies": {
+    "agentkeepalive": "^4.2.1",
+    "json-bigint": "^1.0.0",
+    "superagent": "^8.0.2"
+  }
+}
