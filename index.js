@@ -20,6 +20,40 @@ const JSONbig_rlyBig = JSONbig({
 module.exports = manticoresearch;
 
 //-----------------------------------------------------
+// https://manual.manticoresearch.com/Searching/Filters#Nested-bool-query
+
+function go(func) {
+    const listToEquals = (input) => {
+        if(Array.isArray(input)) {
+            const [name, v] = input;
+            return { equals: { [name]: v } };
+        }
+
+        return input;
+    };
+
+    const result = {
+        andNot(...args) { return { bool: { must_not: [...args].map(listToEquals) } }; },
+
+        and(...args) { return { bool: { must: [...args].map(listToEquals) } }; },
+        or(...args) { return { bool: { should: [...args].map(listToEquals) } }; },
+
+        is(name, v) { return { equals: { [name]: v } }; },
+        term(name, v) { return { term: { [name]: v } }; },
+
+        in(name, list) { return { in: { [name]: list } }; },
+        range(name, range) { return { range: { [name]: range } }; },
+
+        match(name, v) { return { match: { [name]: v } }; },
+        qs(name, v) { return { query_string: { [name]: v } }; },
+    };
+
+    //---]>
+
+    return func ? func(result) : result;
+}
+
+//-----------------------------------------------------
 
 function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
     const baseUrl = 'http://' + host + ':' + port + '/json/';
@@ -120,7 +154,7 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
                 ...params,
 
                 index: this._index,
-                query: q
+                query: typeof q === 'function' ? go(q) : q
             });
 
             return toAsync(req(this._action).send(data));
@@ -134,6 +168,10 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
             }, true);
 
             return toAsync(req(this._action).send(data));
-        }
+        },
+
+        //---]>
+
+        go
     };
 }

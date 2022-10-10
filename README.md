@@ -17,9 +17,9 @@ const r = await ms
         // switch 'insert' to 'update'
         // { id: 0, action: 'update', doc: { title: 'Hello #1' }},
 
-        { doc: { title: 'Hello #1' }},
-        { doc: { title: 'World #1' }},
-        { id: 1, doc: { title: 'Qwerty #1' }}
+        { doc: { a: 1, b: 2, title: 'Hello #1' }},
+        { doc: { a: 1, b: 2, title: 'World #1' }},
+        { id: 1, doc: { a: 3, b: 4, title: 'Qwerty #1' }}
     ]);
 
 console.log(r.data?.items);
@@ -35,6 +35,44 @@ const r = await ms
     .query({ match: { title: 'world' } });
 
 console.log(r.data?.hits);
+```
+
+Nested bool query:
+```javascript
+const r = await ms
+    .index('items')
+    .search()
+    .query((q) => q.and([
+        q.is('a', 1),
+        q.or([
+            q.is('a', 1),
+            q.is('b', 2)
+        ]),
+        q.match('title', 'world'),
+    ]));
+
+console.log(r.data?.hits);
+
+// SELECT *FROM items
+// WHERE a = 1 and (a = 1 or b = 2) and MATCH('@title world')
+```
+
+Nested bool query (short):
+```javascript
+const r = await ms
+    .index('items')
+    .search()
+    .query(_ => _.and(
+        ['a', 0],
+        _.or(['a', 1], ['b', 2]),
+        _.match('title', 'world')
+    ));
+
+
+console.log(r.data?.hits);
+
+// SELECT *FROM items
+// WHERE a = 1 and (a = 1 or b = 2) and MATCH('@title world')
 ```
 
 Delete by Id:
