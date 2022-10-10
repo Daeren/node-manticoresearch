@@ -61,7 +61,7 @@ const r = await ms
             q.is('a', 1),
             q.is('b', 2)
         ]),
-        q.match('title', 'world'),
+        q.match('title', 'world')
     ]));
 
 console.log(r.data?.hits);
