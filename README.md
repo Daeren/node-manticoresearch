@@ -17,9 +17,9 @@ const r = await ms
         // switch 'insert' to 'update'
         // { id: 0, action: 'update', doc: { title: 'Hello #1' }},
 
-        { id: Math.trunc(Math.random() * 1000), doc: { title: 'Hello #1' }},
-        { id: Math.trunc(Math.random() * 1000), doc: { title: 'World #1' }},
-        { id: Math.trunc(Math.random() * 1000), doc: { title: 'Qwerty #1' }}
+        { doc: { title: 'Hello #1' }},
+        { doc: { title: 'World #1' }},
+        { id: 1, doc: { title: 'Qwerty #1' }}
     ]);
 
 console.log(r.data?.items);
@@ -30,7 +30,9 @@ Search:
 const r = await ms
     .index('items')
     .search()
-    .query({ match: { title: 'world' } }, 10);
+    .limit(1)
+    .offset(1)
+    .query({ match: { title: 'world' } });
 
 console.log(r.data?.hits);
 ```
@@ -45,22 +47,22 @@ const r = await ms
 console.log(r.data);
 ```
 
-Delete all:
-```javascript
-const r = await ms
-    .index('items')
-    .delete()
-    .call();
-
-console.log(r.data);
-```
-
 Delete by Query:
 ```javascript
 const r = await ms
     .index('items')
     .delete()
     .query({ match: { title: 'hello' } });
+
+console.log(r.data);
+```
+
+Delete all:
+```javascript
+const r = await ms
+    .index('items')
+    .delete()
+    .call();
 
 console.log(r.data);
 ```

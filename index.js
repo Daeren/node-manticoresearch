@@ -96,6 +96,9 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
         replace() { return this.__bind('_action', 'replace'); },
         update() { return this.__bind('_action', 'update'); },
 
+        limit(v) { return this.__bind('_limit', v); },
+        offset(v) { return this.__bind('_offset', v); },
+
         //---]>
 
         bulk(items) {
@@ -109,17 +112,23 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
 
             return toAsync(req('bulk').send(data));
         },
-        query(q, limit) {
+        query(q, params = {}) {
             const data = pack({
+                limit: this._limit,
+                offset: this._offset,
+
+                ...params,
+
                 index: this._index,
-                query: q,
-                limit
+                query: q
             });
 
             return toAsync(req(this._action).send(data));
         },
-        call(id) {
+        call(id, params = {}) {
             const data = pack({
+                ...params,
+
                 index: this._index,
                 id: typeof id === 'string' ? JSONbig_rlyBig.parse(id) : id
             }, true);
