@@ -1,18 +1,32 @@
+This is a Node.js client for [ManticoreSearch](https://manticoresearch.com). 
+It is written in JavaScript, does not require compiling, and is 100% MIT licensed.
+
+
 ```javascript
 const manticoresearch = require('node-manticoresearch');
 
-const ms = manticoresearch(); // default
+const ms = manticoresearch(); // default (localhost)
 const ms = manticoresearch(9308, '100.100.100.100'); // custom
 
 //---]>
 // response: { data: ..., response: ... }
 ```
 
+
+SQL SELECT query via HTTP JSON interface:
+```javascript
+const raw = false; // default
+const r = await ms.sql(`SELECT * FROM items`, raw);
+
+console.log(r.data);
+```
+- HINT: simple SQL escape - [sqlstring](https://www.npmjs.com/package/sqlstring)
+
+
 Bulk:
 ```javascript
 const r = await ms
-    .index('items')
-    .insert()
+    .insert('items')
     .bulk([
         // switch 'insert' to 'update'
         // { id: 0, action: 'update', doc: { title: 'Hello #1' }},
@@ -25,23 +39,22 @@ const r = await ms
 console.log(r.data?.items);
 ```
 
+
 Search:
 ```javascript
 const r = await ms
-    .index('items')
-    .search()
-    .limit(1)
-    .offset(1)
+    .search('items')
+    .pagination(1, 3) // .limit(size).offset(page * size)
     .query({ match: { title: 'world' } });
 
 console.log(r.data?.hits);
 ```
 
+
 Nested bool query:
 ```javascript
 const r = await ms
-    .index('items')
-    .search()
+    .search('items')
     .query((q) => q.and([
         q.is('a', 1),
         q.or([
@@ -60,8 +73,7 @@ console.log(r.data?.hits);
 Nested bool query (short):
 ```javascript
 const r = await ms
-    .index('items')
-    .search()
+    .search('items')
     .query(_ => _.and(
         ['a', 0],
         _.or(['a', 1], ['b', 2]),
@@ -78,18 +90,17 @@ console.log(r.data?.hits);
 Delete by Id:
 ```javascript
 const r = await ms
-    .index('items')
-    .delete()
+    .delete('items')
     .call('9865535'); // number, string, bigInt
 
 console.log(r.data);
 ```
 
+
 Delete by Query:
 ```javascript
 const r = await ms
-    .index('items')
-    .delete()
+    .delete('items')
     .query({ match: { title: 'hello' } });
 
 console.log(r.data);
@@ -98,17 +109,8 @@ console.log(r.data);
 Delete all:
 ```javascript
 const r = await ms
-    .index('items')
-    .delete()
+    .delete('items')
     .call();
-
-console.log(r.data);
-```
-
-SQL SELECT query via HTTP JSON interface:
-```javascript
-const raw = false; // default
-const r = await ms.sql(`SELECT * FROM items`, raw);
 
 console.log(r.data);
 ```

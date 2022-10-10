@@ -22,7 +22,7 @@ module.exports = manticoresearch;
 //-----------------------------------------------------
 // https://manual.manticoresearch.com/Searching/Filters#Nested-bool-query
 
-function go(func) {
+function queryGo(func) {
     const listToEquals = (input) => {
         if(Array.isArray(input)) {
             const [name, v] = input;
@@ -122,16 +122,17 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
 
         //---]>
 
-        index(name) { return this.__bind('_index', name); },
+        index(name) { return typeof name === 'string' ? this.__bind('_index', name) : this; },
 
-        search() { return this.__bind('_action', 'search'); },
-        delete() { return this.__bind('_action', 'delete'); },
-        insert() { return this.__bind('_action', 'insert'); },
-        replace() { return this.__bind('_action', 'replace'); },
-        update() { return this.__bind('_action', 'update'); },
+        search(index) { return this.index(index).__bind('_action', 'search'); },
+        delete(index) { return this.index(index).__bind('_action', 'delete'); },
+        insert(index) { return this.index(index).__bind('_action', 'insert'); },
+        replace(index) { return this.index(index).__bind('_action', 'replace'); },
+        update(index) { return this.index(index).__bind('_action', 'update'); },
 
         limit(v) { return this.__bind('_limit', v); },
         offset(v) { return this.__bind('_offset', v); },
+        pagination(page, size) { return this.limit(size).offset((Math.max(page, 1) - 1) * size); },
 
         //---]>
 
@@ -154,7 +155,7 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
                 ...params,
 
                 index: this._index,
-                query: typeof q === 'function' ? go(q) : q
+                query: typeof q === 'function' ? queryGo(q) : q
             });
 
             return toAsync(req(this._action).send(data));
@@ -175,10 +176,6 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
         sql(q, raw = false) {
             const data = (raw ? '?mode=raw&' : '') + 'query=' + encodeURIComponent(q);
             return toAsync(req('', 'sql').send(data));
-        },
-
-        //---]>
-
-        go
+        }
     };
 }
