@@ -56,12 +56,12 @@ function go(func) {
 //-----------------------------------------------------
 
 function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
-    const baseUrl = 'http://' + host + ':' + port + '/json/';
+    const baseUrl = 'http://' + host + ':' + port;
 
     //-)>
 
-    const req = (v) => superagent
-        .post(baseUrl + v)
+    const req = (v, type = 'json') => superagent
+        .post(baseUrl + `/${type}` + (type === 'json' ? '/' : '') + v)
         .agent(agent || keepaliveAgent)
         .set('Content-Type', 'application/x-ndjson')
         .buffer(true)
@@ -165,9 +165,16 @@ function manticoresearch(port = 9308, host = '127.0.0.1', agent = null) {
 
                 index: this._index,
                 id: typeof id === 'string' ? JSONbig_rlyBig.parse(id) : id
-            }, true);
+            });
 
             return toAsync(req(this._action).send(data));
+        },
+
+        //---]>
+
+        sql(q, raw = false) {
+            const data = (raw ? '?mode=raw&' : '') + 'query=' + encodeURIComponent(q);
+            return toAsync(req('', 'sql').send(data));
         },
 
         //---]>

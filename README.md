@@ -105,6 +105,14 @@ const r = await ms
 console.log(r.data);
 ```
 
+SQL SELECT query via HTTP JSON interface:
+```javascript
+const raw = false; // default
+const r = await ms.sql(`SELECT * FROM items`, raw);
+
+console.log(r.data);
+```
+
 
 ## License
 
