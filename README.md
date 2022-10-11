@@ -9,7 +9,7 @@ const ms = manticoresearch(); // default (localhost)
 const ms = manticoresearch(9308, '100.100.100.100'); // custom
 
 //---]>
-// response: { data: ..., response: ... }
+// return { data: ..., response: ... }
 ```
 
 
@@ -66,7 +66,7 @@ const r = await ms
 
 console.log(r.data?.hits);
 
-// SELECT *FROM items
+// SELECT * FROM items
 // WHERE a = 1 and (a = 1 or b = 2) and MATCH('@title world')
 ```
 
@@ -83,7 +83,7 @@ const r = await ms
 
 console.log(r.data?.hits);
 
-// SELECT *FROM items
+// SELECT * FROM items
 // WHERE a = 1 and (a = 1 or b = 2) and MATCH('@title world')
 ```
 
@@ -111,6 +111,16 @@ Delete all:
 const r = await ms
     .delete('items')
     .call();
+
+console.log(r.data);
+```
+
+Insert:
+```javascript
+const id = 0; // auto
+const r = await ms
+    .insert('items')
+    .call(id, { doc: { a: 4, b: 4, title: 'hi #1' }});
 
 console.log(r.data);
 ```

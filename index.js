@@ -39,7 +39,6 @@ function queryGo(func) {
         or(...args) { return { bool: { should: [...args].map(listToEquals) } }; },
 
         is(name, v) { return { equals: { [name]: v } }; },
-        term(name, v) { return { term: { [name]: v } }; },
 
         in(name, list) { return { in: { [name]: list } }; },
         range(name, range) { return { range: { [name]: range } }; },
